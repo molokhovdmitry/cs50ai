@@ -93,29 +93,30 @@ def shortest_path(source, target):
     """
 
     """
+    Pseudocode:
     1. Starting node:
         state: source
         parent: None
         action: None
     2. Initialize frontier with a starting node.
     3. Initialize explored set.
-    4. Initialize state counter.
-    3. Loop:
-        - check node for goal state (target == person_id)
-            if it's a goal state make solution:
-                Loop:
-                    add nodes to solution
-                    reverse
-                return solution
-        - add node to explored set
+    4. Loop:
         - remove node and get it's neighbors
         - add neighbors to frontier
+        - check node for goal state
+            if it's a goal state make path:
+                Loop:
+                    add actions and states to path
+                reverse
+                return solution
+        - add node to explored set
     """
+    
+    # Set goal state
+    goal = target
+
     # Starting node
-    start = Node()
-    start.state = source
-    start.parent = None
-    start.action = None
+    start = Node(state=source, parent=None, action=None)
     
     # Initialize frontier with a starting node
     frontier = QueueFrontier()
@@ -124,16 +125,34 @@ def shortest_path(source, target):
     # Initialize explored set
     explored = set()
 
-    # Initialize state counter
-    stateCount = 0
-
     # Loop until solution is found
     while True:
-        
 
-    shortest_path = [(str(104257), str(144)), (str(93779), str(1697))]
-    return shortest_path
-    return None
+        # If nothing left in frontier, then no path
+        if frontier.empty():
+            return None
+
+        # Remove node
+        node = frontier.remove()
+
+        # Add neighbors to frontier
+        for action, state in neighbors_for_person(node.state):
+            if not frontier.contains_state(state) and state not in explored:
+                child = Node(state=state, parent=node, action=action)
+                frontier.add(child)
+                
+                # Check for goal state
+                if child.state == goal:
+                    node = child
+                    path = []
+                    while node.parent is not None:
+                        path.append((node.action, node.state))
+                        node = node.parent
+                    path.reverse()
+                    return path
+
+        # Mark node as explored
+        explored.add(node.state)
 
 def person_id_for_name(name):
     """
