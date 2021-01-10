@@ -113,7 +113,7 @@ def shortest_path(source, target):
     """
     # Ensure source and target are not the same person
     if source == target:
-        sys.exit("It's the same person")
+        sys.exit("It's the same person.")
 
     # Set goal state
     goal = target
