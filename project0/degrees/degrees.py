@@ -111,7 +111,10 @@ def shortest_path(source, target):
                 return solution
         - add node to explored set
     """
-    
+    # Ensure source and target are not the same person
+    if source == target:
+        sys.exit("It's the same person")
+
     # Set goal state
     goal = target
 
