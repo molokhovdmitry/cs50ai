@@ -1,18 +1,14 @@
-from tictactoe import player, actions, result, winner, terminal, utility
+from tictactoe import player, actions, result, winner, terminal, utility, minimax
 
 EMPTY = None
 
-board = [["O", EMPTY, "X"],
-         ["X", "O", "O"],
-         ["X", EMPTY, EMPTY]]
+board = [["O", "X", "X"],
+         [EMPTY, "X", "O"],
+         [EMPTY, "O", "X"]]
 
 actions = actions(board)
 utils = {}
 for action in actions:
     utils[action] = -2
-print(utils)
 
-utils[(2, 1)] = 1
-print(utils)
-
-print(max(utils, key=lambda key: utils[key]))
+print(*result(board, minimax(board)), sep='\n')

@@ -16,7 +16,7 @@ class Node():
         self.parent = parent
         self.action = action
 
-class QueueFrontier():
+class StackFrontier():
     def __init__(self):
         self.frontier = []
     
@@ -33,8 +33,8 @@ class QueueFrontier():
         if self.empty():
             raise Exception("empty frontier")
         else:
-            node = self.frontier[0]
-            self.frontier = self.frontier[1:]
+            node = self.frontier[-1]
+            self.frontier = self.frontier[:-1]
             return node
 
 
@@ -166,7 +166,7 @@ def minimax(board):
         - check if frontier is empty (every action explored)
             if it is empty return action with max utility
         - 
-        
+        if minmax >/< parent minmax value -> change
     """
     if terminal(board):
         return None
@@ -175,11 +175,19 @@ def minimax(board):
     start = Node(state=board, parent=None, action=None)
 
     # Initialize frontier with a starting node
-    frontier = QueueFrontier()
+    frontier = StackFrontier()
     frontier.add(start)
+    
+    # Initialize dictionary that will contain available actions and their minmax value
+    minmaxes = {}
+    for action in actions(board):
+        if player(board) == "X":
+            minmaxes[action] = -2
+        else:
+            minmaxes[action] = 2
 
-    # Initialize utils dictionary that contains utility value for every action
-    utils = {}
+    # Explored games set for stats
+    explored = 0
 
     # Loop until action is found
     while True:
@@ -188,14 +196,37 @@ def minimax(board):
         if frontier.empty():
             # Get action with max/min utility
             if player(board) == "X":
-                action = max(utils, key=lambda key: utils[key])
+                action = max(minmaxes, key=lambda key: minmaxes[key])
             else:
-                action = min(utils, key=lambda key: utils[key])
+                action = min(minmaxes, key=lambda key: minmaxes[key])
             return action
 
         # Remove node
         node = frontier.remove()
-        
-        # Add actions to frontier
-        for action in actions(board):
-            
+
+        if not terminal(node.state):
+            # Add neighbors to frontier
+            for action in actions(node.state):
+                child = Node(state=result(node.state, action), parent=node, action=action)
+                child.minmax = utility(child.state)
+                frontier.add(child)
+        else:
+            # Debug
+            explored += 1
+
+            # Change parents' minmax if it's better
+            if player(board) == "X":
+                while node.parent.parent != None:
+                    if node.minmax > node.parent.minmax:
+                        node.parent.minmax = node.minmax
+                        node = node.parent
+                    else:
+                        break
+            else:
+                while node.parent.parent != None:
+                    if node.minmax < node.parent.minmax:
+                        node.parent.minmax = node.minmax
+                        node = node.parent
+                    else:
+                        break
+            minmaxes[node.action] = node.minmax
