@@ -90,6 +90,7 @@ def winner(board):
     diagonalLR = [board[i][i] for i in range(3)]
     Xcount.add(diagonalLR.count("X"))
     Ocount.add(diagonalLR.count("O"))
+    
     diagonalRL = [board[i][2 - i] for i in range(3)]
     Xcount.add(diagonalRL.count("X"))
     Ocount.add(diagonalRL.count("O"))
@@ -153,7 +154,11 @@ def minimax(board):
         # Fill minmaxes dictionary
         for action in actions(board):
             minmaxes[action] = minValue(result(board, action))
-        # Choose action with max value
+        """
+        Choose action with max value.
+        How to get a key with max/min value from a dictionary: 
+        https://stackoverflow.com/questions/18296755/python-max-function-using-key-and-lambda-expression
+        """
         optimalAction = max(minmaxes, key=lambda key:minmaxes[key])
     # If player is "O"
     else:
