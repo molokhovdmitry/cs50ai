@@ -184,7 +184,7 @@ def maxValue(board):
 
 def minValue(board):
     """
-    Returns max value of a board.
+    Returns min value of a board.
     """
     # Return utility if terminal board
     if terminal(board):
