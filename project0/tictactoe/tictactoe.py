@@ -132,53 +132,66 @@ def minimax(board):
     """
     Pseudocode:
     check for terminal:
-        if terminal return none
+        if terminal:
+            return none
         if not:
             for every action calculate minmax value
             if player is X:
                 return action with max value
             else:
                 return action with min value
-
-    else:
-        min(board)
-
     """
-
+    # Return None if terminal board
     if terminal(board):
         return None
 
+    # Initialize dictionary that contains minmax value for every action
     minmaxes = {}
+
+    # If player is "X"
     if player(board) == "X":
+        # Fill minmaxes dictionary
         for action in actions(board):
             minmaxes[action] = minValue(result(board, action))
+        # Choose action with max value
+        optimalAction = max(minmaxes, key=lambda key:minmaxes[key])
+    # If player is "O"
     else:
+        # Fill minmaxes dictionary
         for action in actions(board):
             minmaxes[action] = maxValue(result(board, action))
+        # Choose action with min value
+        optimalAction = min(minmaxes, key=lambda key:minmaxes[key])
+    
+    # Return optimal action
+    return optimalAction
 
-    if player(board) == "X":
-        return max(minmaxes, key=lambda key:minmaxes[key])
-    else:
-        return min(minmaxes, key=lambda key:minmaxes[key])
 
 def maxValue(board):
     """
     Returns max value of a board.
     """
+    # Return utility if terminal board
     if terminal(board):
         return utility(board)
-    v = -2
+    # Initialize starting value (-infinity)
+    value = -2
+    # Loop through actions and find max value
     for action in actions(board):
-        v = max(v, minValue(result(board, action)))
-    return v
+        value = max(value, minValue(result(board, action)))
+    return value
+
 
 def minValue(board):
     """
     Returns max value of a board.
     """
+    # Return utility if terminal board
     if terminal(board):
         return utility(board)
-    v = 2
+    # Initialize starting value (infinity)
+    value = 2
+    # Loop through actions and find min value
     for action in actions(board):
-        v = min(v, maxValue(result(board, action)))
-    return v
+        value = min(value, maxValue(result(board, action)))
+    return value
