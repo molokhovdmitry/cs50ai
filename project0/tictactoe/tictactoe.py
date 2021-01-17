@@ -9,35 +9,6 @@ X = "X"
 O = "O"
 EMPTY = None
 
-
-class Node():
-    def __init__(self, state, parent, action):
-        self.state = state
-        self.parent = parent
-        self.action = action
-
-class StackFrontier():
-    def __init__(self):
-        self.frontier = []
-    
-    def add(self, node):
-        self.frontier.append(node)
-
-    def contains_state(self, state):
-        return any(node.state == state for node in self.frontier)
-
-    def empty(self):
-        return len(self.frontier) == 0
-
-    def remove(self):
-        if self.empty():
-            raise Exception("empty frontier")
-        else:
-            node = self.frontier[-1]
-            self.frontier = self.frontier[:-1]
-            return node
-
-
 def initial_state():
     """
     Returns starting state of the board.
@@ -160,73 +131,54 @@ def minimax(board):
 
     """
     Pseudocode:
-    1. Check for terminal board.
-    2. Initialize frontier with a starting node.
-    3. Loop:
-        - check if frontier is empty (every action explored)
-            if it is empty return action with max utility
-        - 
-        if minmax >/< parent minmax value -> change
+    check for terminal:
+        if terminal return none
+        if not:
+            for every action calculate minmax value
+            if player is X:
+                return action with max value
+            else:
+                return action with min value
+
+    else:
+        min(board)
+
     """
+
     if terminal(board):
         return None
 
-    # Starting node
-    start = Node(state=board, parent=None, action=None)
-
-    # Initialize frontier with a starting node
-    frontier = StackFrontier()
-    frontier.add(start)
-    
-    # Initialize dictionary that will contain available actions and their minmax value
     minmaxes = {}
+    if player(board) == "X":
+        for action in actions(board):
+            minmaxes[action] = minValue(result(board, action))
+    else:
+        for action in actions(board):
+            minmaxes[action] = maxValue(result(board, action))
+
+    if player(board) == "X":
+        return max(minmaxes, key=lambda key:minmaxes[key])
+    else:
+        return min(minmaxes, key=lambda key:minmaxes[key])
+
+def maxValue(board):
+    """
+    Returns max value of a board.
+    """
+    if terminal(board):
+        return utility(board)
+    v = -2
     for action in actions(board):
-        if player(board) == "X":
-            minmaxes[action] = -2
-        else:
-            minmaxes[action] = 2
+        v = max(v, minValue(result(board, action)))
+    return v
 
-    # Explored games set for stats
-    explored = 0
-
-    # Loop until action is found
-    while True:
-
-        # If nothing left in frontier, return action
-        if frontier.empty():
-            # Get action with max/min utility
-            if player(board) == "X":
-                action = max(minmaxes, key=lambda key: minmaxes[key])
-            else:
-                action = min(minmaxes, key=lambda key: minmaxes[key])
-            return action
-
-        # Remove node
-        node = frontier.remove()
-
-        if not terminal(node.state):
-            # Add neighbors to frontier
-            for action in actions(node.state):
-                child = Node(state=result(node.state, action), parent=node, action=action)
-                child.minmax = utility(child.state)
-                frontier.add(child)
-        else:
-            # Debug
-            explored += 1
-
-            # Change parents' minmax if it's better
-            if player(board) == "X":
-                while node.parent.parent != None:
-                    if node.minmax > node.parent.minmax:
-                        node.parent.minmax = node.minmax
-                        node = node.parent
-                    else:
-                        break
-            else:
-                while node.parent.parent != None:
-                    if node.minmax < node.parent.minmax:
-                        node.parent.minmax = node.minmax
-                        node = node.parent
-                    else:
-                        break
-            minmaxes[node.action] = node.minmax
+def minValue(board):
+    """
+    Returns max value of a board.
+    """
+    if terminal(board):
+        return utility(board)
+    v = 2
+    for action in actions(board):
+        v = min(v, maxValue(result(board, action)))
+    return v

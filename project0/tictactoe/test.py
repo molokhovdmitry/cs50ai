@@ -2,13 +2,14 @@ from tictactoe import player, actions, result, winner, terminal, utility, minima
 
 EMPTY = None
 
-board = [["O", "X", "X"],
-         [EMPTY, "X", "O"],
-         [EMPTY, "O", "X"]]
+board = [[EMPTY, "X", "O"],
+         ["O", "X", EMPTY],
+         ["X", EMPTY, "O"]]
 
 actions = actions(board)
 utils = {}
 for action in actions:
     utils[action] = -2
 
-print(*result(board, minimax(board)), sep='\n')
+print(minimax(board))
+#print(*result(board, minimax(board)), sep='\n')
