@@ -1,10 +1,13 @@
-from tictactoe import player, actions, result, winner, terminal, utility, minimax
+from tictactoe import player, actions, result, winner, terminal, utility, minimax, maxValue, minValue
+import operator
 
 EMPTY = None
 
-board = [[EMPTY, "X", "O"],
-         ["O", "X", EMPTY],
-         ["X", EMPTY, "O"]]
+board = [["X", EMPTY, EMPTY],
+         ["O", "O", EMPTY],
+         ["X", EMPTY, "X"]]
 
-print(minimax(board))
-print(*result(board, minimax(board)), sep='\n')
+print(maxValue([["X", EMPTY, EMPTY],
+                ["O", "O", EMPTY],
+                ["X", "O", "X"]], -2, 2))
+

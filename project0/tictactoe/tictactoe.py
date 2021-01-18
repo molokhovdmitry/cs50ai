@@ -4,6 +4,8 @@ Tic Tac Toe Player
 
 import math
 from copy import deepcopy
+import operator
+from random import shuffle
 
 X = "X"
 O = "O"
@@ -146,33 +148,36 @@ def minimax(board):
     if terminal(board):
         return None
 
-    # Initialize dictionary that contains minmax value for every action
-    minmaxes = {}
+    # Initialize list that contains minmax value for every action in tuples
+    minmaxes = []
 
     # If player is "X"
     if player(board) == "X":
-        # Fill minmaxes dictionary
+        # Fill minmaxes list
         for action in actions(board):
-            minmaxes[action] = minValue(result(board, action))
+            minmaxes.append((action, minValue(result(board, action), -2, 2)))
         """
-        Choose action with max value.
-        How to get a key with max/min value from a dictionary: 
-        https://stackoverflow.com/questions/18296755/python-max-function-using-key-and-lambda-expression
+        Choose random action with max value.
+        How to get a tuple element with max/min second value in a list: 
+        https://stackoverflow.com/questions/13039192/max-second-element-in-tuples-python
         """
-        optimalAction = max(minmaxes, key=lambda key:minmaxes[key])
+        shuffle(minmaxes)
+        optimalAction = max(minmaxes, key=operator.itemgetter(1))[0]
+        
     # If player is "O"
     else:
-        # Fill minmaxes dictionary
+        # Fill minmaxes list
         for action in actions(board):
-            minmaxes[action] = maxValue(result(board, action))
-        # Choose action with min value
-        optimalAction = min(minmaxes, key=lambda key:minmaxes[key])
+            minmaxes.append((action, maxValue(result(board, action), -2, 2)))
+        # Choose random action with min value
+        shuffle(minmaxes)
+        optimalAction = min(minmaxes, key=operator.itemgetter(1))[0]
     
     # Return optimal action
     return optimalAction
 
 
-def maxValue(board):
+def maxValue(board, alpha, beta):
     """
     Returns max value of a board.
     """
@@ -183,11 +188,14 @@ def maxValue(board):
     value = -2
     # Loop through actions and find max value
     for action in actions(board):
-        value = max(value, minValue(result(board, action)))
+        value = max(value, minValue(result(board, action), alpha, beta))
+        alpha = max(alpha, value)
+        if alpha >= beta or value == 1:
+            return value
     return value
 
 
-def minValue(board):
+def minValue(board, alpha, beta):
     """
     Returns min value of a board.
     """
@@ -198,5 +206,8 @@ def minValue(board):
     value = 2
     # Loop through actions and find min value
     for action in actions(board):
-        value = min(value, maxValue(result(board, action)))
+        value = min(value, maxValue(result(board, action), alpha, beta))
+        beta = max(beta, value)
+        if beta <= alpha or value == -1:
+            return value
     return value
