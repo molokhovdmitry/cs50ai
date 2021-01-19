@@ -148,14 +148,14 @@ def minimax(board):
     if terminal(board):
         return None
 
-    # Initialize list that contains minmax value for every action in tuples
+    # Initialize list that contains minmax values for every action in tuples
     minmaxes = []
 
     # If player is "X"
     if player(board) == "X":
         # Fill minmaxes list
         for action in actions(board):
-            minmaxes.append((action, minValue(result(board, action), -2, 2)))
+            minmaxes.append((action, minValue(result(board, action), -3, 3, 0)))
         """
         Choose random action with max value.
         How to get a tuple element with max/min second value in a list: 
@@ -168,45 +168,60 @@ def minimax(board):
     else:
         # Fill minmaxes list
         for action in actions(board):
-            minmaxes.append((action, maxValue(result(board, action), -2, 2)))
+            minmaxes.append((action, maxValue(result(board, action), -3, 3, 0)))
         # Choose random action with min value
         shuffle(minmaxes)
         optimalAction = min(minmaxes, key=operator.itemgetter(1))[0]
     
+    print(minmaxes)
     # Return optimal action
     return optimalAction
 
 
-def maxValue(board, alpha, beta):
+def maxValue(board, alpha, beta, level):
     """
     Returns max value of a board.
+    'level' keeps track of how deep the function is in the tree 
+    to prioritize one turn win moves.
     """
-    # Return utility if terminal board
+    # Update level
+    level += 1
+    # Return utility if terminal board or 'utility * 2' if it is a one turn win move
     if terminal(board):
-        return utility(board)
+        util = utility(board)
+        if level == 1:
+            return util * 2
+        return util
     # Initialize starting value (-infinity)
-    value = -2
+    value = -3
     # Loop through actions and find max value
     for action in actions(board):
-        value = max(value, minValue(result(board, action), alpha, beta))
+        value = max(value, minValue(result(board, action), alpha, beta, level))
         alpha = max(alpha, value)
         if alpha >= beta or value == 1:
             return value
     return value
 
 
-def minValue(board, alpha, beta):
+def minValue(board, alpha, beta, level):
     """
     Returns min value of a board.
+    'level' keeps track of how deep the function is in the tree 
+    to prioritize one turn win moves.
     """
-    # Return utility if terminal board
+    # Update level
+    level += 1
+    # Return utility if terminal board or 'utility * 2' if it is a one turn win move
     if terminal(board):
-        return utility(board)
+        util = utility(board)
+        if level == 1:
+            return util * 2
+        return util
     # Initialize starting value (infinity)
-    value = 2
+    value = 3
     # Loop through actions and find min value
     for action in actions(board):
-        value = min(value, maxValue(result(board, action), alpha, beta))
+        value = min(value, maxValue(result(board, action), alpha, beta, level))
         beta = max(beta, value)
         if beta <= alpha or value == -1:
             return value

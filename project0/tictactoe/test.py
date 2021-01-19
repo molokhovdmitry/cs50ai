@@ -8,6 +8,11 @@ board = [["X", EMPTY, EMPTY],
          ["X", EMPTY, "X"]]
 
 print(maxValue([["X", EMPTY, EMPTY],
-                ["O", "O", EMPTY],
-                ["X", "O", "X"]], -2, 2))
+                ["O", "O", "O"],
+                ["X", EMPTY, "X"]], -3, 3, 1))
 
+print(maxValue([["X", EMPTY, EMPTY],
+                ["O", "O", EMPTY],
+                ["X", EMPTY, "X"]], -3, 3, 1))
+
+print(minimax(board))
