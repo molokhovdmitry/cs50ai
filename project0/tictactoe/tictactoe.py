@@ -173,7 +173,6 @@ def minimax(board):
         shuffle(minmaxes)
         optimalAction = min(minmaxes, key=operator.itemgetter(1))[0]
     
-    print(minmaxes)
     # Return optimal action
     return optimalAction
 
