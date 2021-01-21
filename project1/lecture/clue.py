@@ -1,6 +1,6 @@
 import termcolor
 
-from logic import *
+from cs50.ai.project1.lecture.logic import *
 
 mustard = Symbol("ColMustard")
 plum = Symbol("ProfPlum")
