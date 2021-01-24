@@ -1,4 +1,4 @@
-from project0.tictactoe.tictactoe import player, actions, result, winner, terminal, utility, minimax, maxValue, minValue
+from tictactoe import player, actions, result, winner, terminal, utility, minimax, maxValue, minValue
 import operator
 
 EMPTY = None
