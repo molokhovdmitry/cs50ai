@@ -1,4 +1,4 @@
-from logic import *
+from project1.lecture.logic import *
 
 colors = ["red", "blue", "green", "yellow"]
 symbols = []
@@ -54,3 +54,5 @@ knowledge.add(And(
 for symbol in symbols:
     if model_check(knowledge, symbol):
         print(symbol)
+
+print(knowledge.formula())

@@ -1,4 +1,4 @@
-from logic import *
+from project1.lecture.logic import *
 
 rain = Symbol("rain")
 hagrid = Symbol("hagrid")
