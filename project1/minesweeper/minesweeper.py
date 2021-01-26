@@ -197,16 +197,19 @@ class MinesweeperAI():
         self.mark_safe(cell)
         
         # 3
-        # Get nearby undetermined cells
+        # Get nearby cells
         cells = set()
         for i in range(cell[0] - 1, cell[0] + 2):
             for j in range(cell[1] - 1, cell[1] + 2):
                 if (i, j) != cell:
                     if 0 <= i < self.height and 0 <= j < self.width:
-                        if (i, j) not in self.mines and (i, j) not in self.safes:
+                        if (i, j) in self.mines:
+                            count -= 1
+                        elif (i, j) not in self.safes:
                             cells.add((i, j))
         # Add sentence
-        self.knowledge.append(Sentence(cells, count))
+        if len(cells):
+            self.knowledge.append(Sentence(cells, count))
 
         # 4
         # Loop through all sentences and mark mines and safes until no more mines and safes found
@@ -228,7 +231,15 @@ class MinesweeperAI():
                     newKnowledge = True
                     for safe in safes.copy():
                         self.mark_safe(safe)
-        # 5
+                # Add new sentences
+                for anotherSentence in self.knowledge:
+                    if sentence != anotherSentence:
+                        if sentence.cells.issubset(anotherSentence.cells):
+                            newSentence = Sentence(anotherSentence.cells.difference(sentence.cells), anotherSentence.count - sentence.count)
+                            if newSentence not in self.knowledge:
+                                newKnowledge = True
+                                self.knowledge.append(newSentence)
+        
 
 
         # Debug
@@ -238,7 +249,7 @@ class MinesweeperAI():
         print(self.safes)
         print("mines:")
         print(self.mines)
-        print('\n')
+        print()
 
 
     def make_safe_move(self):
@@ -254,7 +265,7 @@ class MinesweeperAI():
             if move not in self.moves_made:
                 print(f"Move: {move}")
                 return move
-        return None
+        print("No moves")
 
 
     def make_random_move(self):

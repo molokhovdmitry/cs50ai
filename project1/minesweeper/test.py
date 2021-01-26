@@ -9,18 +9,22 @@ for i in range(height):
                 row.append(False)
             board.append(row)
 
-# Add mines
-board[2][2] = True
-board[7][4] = True
+knowledge = []
+knowledge.append(Sentence({(0, 1), (0, 0)}, 1))
+knowledge.append(Sentence({(0, 1), (0, 2), (0, 0)}, 2))
 
-print(*board, sep='\n')
+for sentence in knowledge:
+    print(sentence.__str__())
+print()
 
-cell = (2, 0)
-cells = set()
-for i in range(cell[0] - 1, cell[0] + 2):
-    for j in range(cell[1] - 1, cell[1] + 2):
-        if (i, j) != cell:
-            if 0 <= i < height and 0 <= j < width:
-                cells.add((i, j))
+for sentence in knowledge:
+    for anotherSentence in knowledge:
+        if sentence != anotherSentence:
+            if sentence.cells.issubset(anotherSentence.cells):
+                newSentence = Sentence(anotherSentence.cells.difference(sentence.cells), anotherSentence.count - sentence.count)
+                if newSentence not in knowledge:
+                    newKnowledge = True
+                    knowledge.append(newSentence)
 
-print(cells)
+for sentence in knowledge:
+    print(sentence.__str__())
