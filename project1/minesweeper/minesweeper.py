@@ -265,9 +265,6 @@ class MinesweeperAI():
         # Remove empty sentences
         while Sentence(set(), 0) in self.knowledge:
             self.knowledge.remove(Sentence(set(), 0))
-        
-        for sentence in self.knowledge:
-            print(sentence.__str__())
 
 
     def make_safe_move(self):
