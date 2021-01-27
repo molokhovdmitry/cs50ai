@@ -272,9 +272,11 @@ class MinesweeperAI():
         This function may use the knowledge in self.mines, self.safes
         and self.moves_made, but should not modify any of those values.
         """
-        for move in self.safes:
-            if move not in self.moves_made:
-                return move
+        # Substract made moves from safe moves
+        moves = self.safes.difference(self.moves_made)
+        if len(moves):
+            # Choose move with min values for more realistic behavior
+            return min(moves)
 
 
     def make_random_move(self):
