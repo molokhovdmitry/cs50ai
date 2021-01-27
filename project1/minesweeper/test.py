@@ -10,8 +10,17 @@ for i in range(height):
             board.append(row)
 
 knowledge = []
+knowledge.append(Sentence(set(), 0))
+knowledge.append(Sentence(set(), 0))
+knowledge.append(Sentence(set(), 0))
 knowledge.append(Sentence({(0, 1), (0, 0)}, 1))
+knowledge.append(Sentence(set(), 0))
+knowledge.append(Sentence(set(), 0))
+knowledge.append(Sentence(set(), 0))
 knowledge.append(Sentence({(0, 1), (0, 2), (0, 0)}, 2))
+knowledge.append(Sentence(set(), 0))
+knowledge.append(Sentence(set(), 0))
+knowledge.append(Sentence(set(), 0))
 
 for sentence in knowledge:
     print(sentence.__str__())
@@ -28,3 +37,21 @@ for sentence in knowledge:
 
 for sentence in knowledge:
     print(sentence.__str__())
+print()
+
+for sentence in knowledge:
+    if len(sentence.cells) == 0:
+        knowledge.remove(sentence)
+
+for sentence in knowledge:
+    print(sentence.__str__())
+    print(len(sentence.cells))
+print()
+
+while Sentence(set(), 0) in knowledge:
+    knowledge.remove(Sentence(set(), 0))
+
+for sentence in knowledge:
+    print(sentence.__str__())
+    print(len(sentence.cells))
+print()
