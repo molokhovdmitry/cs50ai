@@ -3,6 +3,8 @@ import random
 import re
 import sys
 
+from collections import Counter
+
 DAMPING = 0.85
 SAMPLES = 10000
 
@@ -12,17 +14,15 @@ def main():
         sys.exit("Usage: python pagerank.py corpus")
     corpus = crawl(sys.argv[1])
     ranks = sample_pagerank(corpus, DAMPING, SAMPLES)
-
-    print(transition_model(corpus, '3.html', DAMPING))
-    """
     print(f"PageRank Results from Sampling (n = {SAMPLES})")
     for page in sorted(ranks):
         print(f"  {page}: {ranks[page]:.4f}")
+    
     ranks = iterate_pagerank(corpus, DAMPING)
     print(f"PageRank Results from Iteration")
     for page in sorted(ranks):
         print(f"  {page}: {ranks[page]:.4f}")
-    """
+    
 
 
 def crawl(directory):
@@ -63,8 +63,8 @@ def transition_model(corpus, page, damping_factor):
     """
     # Initialize output dict
     output = {}
-    for key in corpus.keys():
-        output[key] = 0
+    for page in corpus.keys():
+        output[page] = 0
 
     # Check page links and add probability
     links = corpus[page]
@@ -91,7 +91,25 @@ def sample_pagerank(corpus, damping_factor, n):
     their estimated PageRank value (a value between 0 and 1). All
     PageRank values should sum to 1.
     """
+    # Choose random page
+    page = random.choice(list(corpus.keys()))
 
+    pages = []
+    for i in range(n):
+        # Get probabilities
+        transition = transition_model(corpus, page, damping_factor)
+
+        # Choose page
+        page = random.choices(list(transition.keys()), weights=list(transition.values()), k=1)[0]
+
+        # Count page
+        pages.append(page)
+    
+    # Calculate PageRank value
+    pages = dict(Counter(pages))
+    for page in pages:
+        pages[page] = pages[page] / n
+    return pages
 
 def iterate_pagerank(corpus, damping_factor):
     """
@@ -102,6 +120,17 @@ def iterate_pagerank(corpus, damping_factor):
     their estimated PageRank value (a value between 0 and 1). All
     PageRank values should sum to 1.
     """
+    # Initialize output
+    PR = {}
+    N = len(corpus)
+    for page in corpus:
+        PR[page] = 1 / N
+    
+    # 
+    d = damping_factor
+    while True:
+        
+        
 
 
 if __name__ == "__main__":
