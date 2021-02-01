@@ -61,10 +61,10 @@ def transition_model(corpus, page, damping_factor):
     linked to by `page`. With probability `1 - damping_factor`, choose
     a link at random chosen from all pages in the corpus.
     """
-    # Initialize output dict
-    output = {}
-    for page in corpus.keys():
-        output[page] = 0
+    # Initialize model dict
+    model = {}
+    for p in corpus.keys():
+        model[p] = 0
 
     # Check page links and add probability
     links = corpus[page]
@@ -72,14 +72,14 @@ def transition_model(corpus, page, damping_factor):
     if linkAmount:
         prob = damping_factor / linkAmount
         for link in links:
-            output[link] += prob
+            model[link] += prob
     
     # Add random probability
     prob = (1 - damping_factor) / len(corpus)
-    for link in output:
-        output[link] += prob
+    for link in model:
+        model[link] += prob
     
-    return output
+    return model
 
 
 def sample_pagerank(corpus, damping_factor, n):
@@ -98,8 +98,8 @@ def sample_pagerank(corpus, damping_factor, n):
     for i in range(n):
         # Get probabilities
         transition = transition_model(corpus, page, damping_factor)
-
-        # Choose page
+        
+        # Make weighted random choice
         page = random.choices(list(transition.keys()), weights=list(transition.values()), k=1)[0]
 
         # Count page
@@ -126,11 +126,27 @@ def iterate_pagerank(corpus, damping_factor):
     for page in corpus:
         PR[page] = 1 / N
     
-    # 
     d = damping_factor
+    # Iterate until no value changes more than 0.001
     while True:
+        PRold = PR.copy()
+        for page in corpus:
+            PR[page] = 0
+
+            # Second condition
+            for link in corpus:
+                if len(corpus[link]) == 0:
+                    PR[page] += PR[link] / N
+                elif page in corpus[link]:
+                    PR[page] += PR[link] / len(corpus[link])
+            PR[page] *= d
+
+            # First condition
+            PR[page] += (1 - d) / N
         
-        
+        # Check for return condition
+        if all([abs(PR[page] - PRold[page]) < 0.001 for page in PR]):
+            return PR
 
 
 if __name__ == "__main__":
