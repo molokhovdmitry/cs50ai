@@ -90,6 +90,11 @@ class CrosswordCreator():
         Enforce node and arc consistency, and then solve the CSP.
         """
         self.enforce_node_consistency()
+        """
+        print(self.domains)
+        self.revise(Variable(0, 1, 'across', 3), Variable(0, 1, 'down', 5))
+        print(self.domains)
+        """
         self.ac3()
         return self.backtrack(dict())
 
@@ -99,7 +104,14 @@ class CrosswordCreator():
         (Remove any values that are inconsistent with a variable's unary
          constraints; in this case, the length of the word.)
         """
-        raise NotImplementedError
+        # Iterate over variables
+        for variable in self.domains:
+            # Iterate over words in variable's domain
+            for word in self.domains[variable].copy():
+                # Remove word if wrong length
+                if len(word) != variable.length:
+                    self.domains[variable].remove(word)
+
 
     def revise(self, x, y):
         """
@@ -110,7 +122,21 @@ class CrosswordCreator():
         Return True if a revision was made to the domain of `x`; return
         False if no revision was made.
         """
-        raise NotImplementedError
+        revised = False
+        # Get positions of overlapping letters for `x` and `y`
+        l = self.crossword.overlaps[(x, y)]
+        if l:
+            # Iterate over every word in `x`
+            for wordX in self.domains[x].copy():
+                """
+                Remove word from `x` if no words from `y` contain letter
+                `wordX[l[0]]` in position `l[1]` of `wordY`.
+                """
+                if not any([wordX[l[0]] == wordY[l[1]] for wordY in self.domains[y]]):
+                    self.domains[x].remove(wordX)
+                    revised = True
+        return revised
+
 
     def ac3(self, arcs=None):
         """
@@ -121,7 +147,27 @@ class CrosswordCreator():
         Return True if arc consistency is enforced and no domains are empty;
         return False if one or more domains end up empty.
         """
-        raise NotImplementedError
+        # Make queue
+        queue = set()
+        for x in self.domains:
+            for y in self.crossword.neighbors(x):
+                queue.add((x, y))
+        
+        # Go through queue
+        while queue:
+            # Dequeue
+            (x, y) = queue.pop()
+            # Revise and check if revision was made
+            if self.revise(x, y):
+                # Return `False` if empty domain
+                if len(self.domains[x]) == 0:
+                    return False
+                # Enqueue neighbors to queue
+                for z in self.crossword.neighbors(x):
+                    if z != y:
+                        queue.add((x, z))
+        return True
+            
 
     def assignment_complete(self, assignment):
         """
