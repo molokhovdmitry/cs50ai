@@ -22,6 +22,8 @@ def main():
     # Train model and make predictions
     model = train_model(X_train, y_train)
     predictions = model.predict(X_test)
+    print(predictions)
+    sys.exit()
     sensitivity, specificity = evaluate(y_test, predictions)
 
     # Print results
@@ -59,7 +61,37 @@ def load_data(filename):
     labels should be the corresponding list of labels, where each label
     is 1 if Revenue is true, and 0 otherwise.
     """
-    raise NotImplementedError
+    with open(filename) as csvfile:
+        reader = csv.DictReader(csvfile)
+
+        evidence = []
+        labels = []
+
+        for row in reader:
+            rawEvidence = list(row.values())[:-1]
+            evidence.append([
+                int(row["Administrative"]),
+                int(row["Administrative_Duration"]),
+                int(row["Informational"]),
+                int(row["Informational_Duration"]),
+                int(row["ProductRelated"]),
+                float(row["ProductRelated_Duration"]),
+                int(row["BounceRates"]),
+                float(row["ExitRates"]),
+                int(row["PageValues"]),
+                int(row["SpecialDay"]),
+                int(row["Month"]),
+                int(row["OperatingSystems"]),
+                int(row["Browser"]),
+                int(row["Region"]),
+                int(row["TrafficType"]),
+                1 if row["VisitorType"] == "TRUE" else 0,
+                int(row["Weekend"])
+            ])
+            labels.append(1 if row["Revenue"] == "TRUE" else 0)
+    print(evidence)
+    sys.exit()
+    return evidence, labels
 
 
 def train_model(evidence, labels):
@@ -67,7 +99,10 @@ def train_model(evidence, labels):
     Given a list of evidence lists and a list of labels, return a
     fitted k-nearest neighbor model (k=1) trained on the data.
     """
-    raise NotImplementedError
+    model = KNeighborsClassifier(n_neighbors=1)
+    model.fit(evidence, labels)
+
+    return model
 
 
 def evaluate(labels, predictions):
@@ -85,7 +120,7 @@ def evaluate(labels, predictions):
     representing the "true negative rate": the proportion of
     actual negative labels that were accurately identified.
     """
-    raise NotImplementedError
+    
 
 
 if __name__ == "__main__":
