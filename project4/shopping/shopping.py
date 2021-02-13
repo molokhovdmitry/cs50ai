@@ -22,8 +22,6 @@ def main():
     # Train model and make predictions
     model = train_model(X_train, y_train)
     predictions = model.predict(X_test)
-    print(predictions)
-    sys.exit()
     sensitivity, specificity = evaluate(y_test, predictions)
 
     # Print results
@@ -61,36 +59,55 @@ def load_data(filename):
     labels should be the corresponding list of labels, where each label
     is 1 if Revenue is true, and 0 otherwise.
     """
+    # Open csv file
     with open(filename) as csvfile:
         reader = csv.DictReader(csvfile)
 
+        # Initialize `evidence` and `labels` lists
         evidence = []
         labels = []
 
+        # Go through every row
         for row in reader:
-            rawEvidence = list(row.values())[:-1]
+            month = row["Month"]
+
+            # Convert to required data types and append to `evidence`
             evidence.append([
                 int(row["Administrative"]),
-                int(row["Administrative_Duration"]),
+                float(row["Administrative_Duration"]),
                 int(row["Informational"]),
-                int(row["Informational_Duration"]),
+                float(row["Informational_Duration"]),
                 int(row["ProductRelated"]),
                 float(row["ProductRelated_Duration"]),
-                int(row["BounceRates"]),
+                float(row["BounceRates"]),
                 float(row["ExitRates"]),
-                int(row["PageValues"]),
-                int(row["SpecialDay"]),
-                int(row["Month"]),
+                float(row["PageValues"]),
+                float(row["SpecialDay"]),
+                (
+                    0  if month == "Jan" else
+                    1  if month == "Feb" else
+                    2  if month == "Mar" else
+                    3  if month == "Apr" else
+                    4  if month == "May" else
+                    5  if month == "Jun" else
+                    6  if month == "Jul" else
+                    7  if month == "Aug" else
+                    8  if month == "Sep" else
+                    9  if month == "Oct" else
+                    10 if month == "Nov" else
+                    11                    
+                ),
                 int(row["OperatingSystems"]),
                 int(row["Browser"]),
                 int(row["Region"]),
                 int(row["TrafficType"]),
-                1 if row["VisitorType"] == "TRUE" else 0,
-                int(row["Weekend"])
+                1 if row["VisitorType"] == "Returning_Visitor" else 0,
+                1 if row["Weekend"] == "TRUE" else 0,
             ])
+
+            # Append to `labels`
             labels.append(1 if row["Revenue"] == "TRUE" else 0)
-    print(evidence)
-    sys.exit()
+
     return evidence, labels
 
 
@@ -99,7 +116,10 @@ def train_model(evidence, labels):
     Given a list of evidence lists and a list of labels, return a
     fitted k-nearest neighbor model (k=1) trained on the data.
     """
+    # Choose model
     model = KNeighborsClassifier(n_neighbors=1)
+
+    # Train model
     model.fit(evidence, labels)
 
     return model
@@ -120,8 +140,18 @@ def evaluate(labels, predictions):
     representing the "true negative rate": the proportion of
     actual negative labels that were accurately identified.
     """
-    
+    # Count accurately identified positives and negatives
+    truePositives = 0
+    trueNegatives = 0
+    for label, prediction in zip(labels, predictions):
+        truePositives += label and prediction
+        trueNegatives += not label and not prediction
 
+    # Calculate sensitivity and specificity
+    sensitivity = truePositives / labels.count(1)
+    specificity = trueNegatives / labels.count(0)
+
+    return sensitivity, specificity
 
 if __name__ == "__main__":
     main()
