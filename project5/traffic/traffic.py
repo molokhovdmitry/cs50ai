@@ -6,6 +6,14 @@ import tensorflow as tf
 
 from sklearn.model_selection import train_test_split
 
+"""
+GPU support fix.
+https://github.com/tensorflow/tensorflow/issues/24828#issuecomment-464910864
+"""
+config = tf.compat.v1.ConfigProto()
+config.gpu_options.allow_growth = True
+session = tf.compat.v1.Session(config=config)
+
 EPOCHS = 10
 IMG_WIDTH = 30
 IMG_HEIGHT = 30
@@ -58,7 +66,26 @@ def load_data(data_dir):
     be a list of integer labels, representing the categories for each of the
     corresponding `images`.
     """
-    raise NotImplementedError
+    
+    images = []
+    labels = []
+
+    # Iterate through categories
+    for categoryname in os.listdir(data_dir):
+        # Iterate through files in category
+        for filename in os.listdir(os.path.join(data_dir, categoryname)):
+            # Open image
+            path = os.path.join(data_dir, categoryname, filename)
+            img = cv2.imread(path)
+
+            # Resize image
+            img = cv2.resize(img, (IMG_HEIGHT, IMG_WIDTH), interpolation=cv2.INTER_AREA)
+
+            # Append to data
+            images.append(img)
+            labels.append(categoryname)
+           
+    return images, labels
 
 
 def get_model():
