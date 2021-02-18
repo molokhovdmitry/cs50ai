@@ -5,6 +5,9 @@ import sys
 import tensorflow as tf
 
 from sklearn.model_selection import train_test_split
+from tensorflow import keras
+from tensorflow.python.keras.layers.core import Dropout
+from tensorflow.python.util.nest import flatten
 
 """
 GPU support fix.
@@ -94,7 +97,29 @@ def get_model():
     `input_shape` of the first layer is `(IMG_WIDTH, IMG_HEIGHT, 3)`.
     The output layer should have `NUM_CATEGORIES` units, one for each category.
     """
-    raise NotImplementedError
+    # Define Sequential model
+    model = tf.keras.Sequential(
+        [
+            tf.keras.layers.Flatten(),
+
+            # Hidden layers
+            tf.keras.layers.Dense(100, activation="relu"),
+
+            # Dropout
+            tf.keras.layers.Dropout(0.5),
+
+            # Output
+            tf.keras.layers.Dense(NUM_CATEGORIES, activation="softmax"),
+        ]
+    )
+
+    model.compile(
+        optimizer="adam",
+        loss="categorical_crossentropy",
+        metrics=["accuracy"]
+    )
+
+    return model
 
 
 if __name__ == "__main__":
