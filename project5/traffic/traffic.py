@@ -1,3 +1,5 @@
+import time
+
 import cv2
 import numpy as np
 import os
@@ -5,9 +7,6 @@ import sys
 import tensorflow as tf
 
 from sklearn.model_selection import train_test_split
-from tensorflow import keras
-from tensorflow.python.keras.layers.core import Dropout
-from tensorflow.python.util.nest import flatten
 
 """
 GPU support fix.
@@ -46,7 +45,7 @@ def main():
     model.fit(x_train, y_train, epochs=EPOCHS)
 
     # Evaluate neural network performance
-    model.evaluate(x_test,  y_test, verbose=2)
+    model.evaluate(x_test, y_test, verbose=2)
 
     # Save model to file
     if len(sys.argv) == 3:
@@ -85,7 +84,7 @@ def load_data(data_dir):
             img = cv2.resize(img, (IMG_HEIGHT, IMG_WIDTH), interpolation=cv2.INTER_AREA)
 
             # Append to data
-            images.append(img)
+            images.append(img / 255.0)
             labels.append(categoryname)
            
     return images, labels
@@ -98,21 +97,38 @@ def get_model():
     The output layer should have `NUM_CATEGORIES` units, one for each category.
     """
     # Define Sequential model
-    model = tf.keras.Sequential(
-        [
-            tf.keras.layers.Flatten(),
+    model = tf.keras.Sequential([
+            
+        # Convolutional layer
+        tf.keras.layers.Conv2D(
+            32, (3, 3), activation="relu", input_shape=(IMG_HEIGHT, IMG_WIDTH, 3)
+        ),
 
-            # Hidden layers
-            tf.keras.layers.Dense(100, activation="relu"),
+        # Max-pooling layer
+        tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
+            
+        # Convolutional layer
+        tf.keras.layers.Conv2D(
+            32, (3, 3), activation="relu", 
+        ),
 
-            # Dropout
-            tf.keras.layers.Dropout(0.5),
+        # Max-pooling layer
+        tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
+            
+        # Flatten units
+        tf.keras.layers.Flatten(),
 
-            # Output
-            tf.keras.layers.Dense(NUM_CATEGORIES, activation="softmax"),
-        ]
-    )
+        # Hidden layers
+        tf.keras.layers.Dense(128, activation="relu"),
 
+        # Dropout
+        tf.keras.layers.Dropout(0.5),
+
+        # Output
+        tf.keras.layers.Dense(NUM_CATEGORIES, activation="softmax"),
+    ])
+
+    # Compile
     model.compile(
         optimizer="adam",
         loss="categorical_crossentropy",
