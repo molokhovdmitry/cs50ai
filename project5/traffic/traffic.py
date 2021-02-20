@@ -78,16 +78,20 @@ def load_data(data_dir):
         for filename in os.listdir(os.path.join(data_dir, categoryname)):
             # Open image
             path = os.path.join(data_dir, categoryname, filename)
-            img = cv2.imread(path)
-
-            # Resize image
-            img = cv2.resize(img, (IMG_HEIGHT, IMG_WIDTH), interpolation=cv2.INTER_AREA)
 
             # Append to data
-            images.append(img / 255.0)
+            images.append(convertImg(path))
             labels.append(categoryname)
            
     return images, labels
+
+
+def convertImg(path):
+    # Open and resize image
+    img = cv2.imread(path)
+    img = cv2.resize(img, (IMG_HEIGHT, IMG_WIDTH), interpolation=cv2.INTER_AREA)
+    
+    return img / 255.0
 
 
 def get_model():
@@ -109,7 +113,7 @@ def get_model():
             
         # Convolutional layer
         tf.keras.layers.Conv2D(
-            32, (3, 3), activation="relu", 
+            32, (3, 3), activation="relu"
         ),
 
         # Max-pooling layer
