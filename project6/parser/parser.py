@@ -85,7 +85,6 @@ def np_chunk(tree):
     """
     phrases = [
         subtree for subtree in tree.subtrees()
-
         if str(subtree).rfind("NP") == 1
     ]
 
